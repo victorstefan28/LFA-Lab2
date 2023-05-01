@@ -9,7 +9,7 @@ using namespace std;
 
 
 map <string, set<pair<string, string>>> nfa;
-map <string, set<string>> inchideri_set;
+//map <string, set<string>> inchideri_set;
 vector<string> finals;
 
 
@@ -17,23 +17,12 @@ void comp_inchideri_stare(map <string, set<pair<string, string>>> &nfa, string s
 {
     inchideri.insert(state);
 
-    queue<string> q;
-    q.push(state);
-
-    while(!q.empty()) {
-        string current = q.front();
-        q.pop();
-
-        for(auto tr : nfa[current]) {
-            if(tr.first == "$") {
-                string next = tr.second;
-                if(inchideri.count(next) == 0) {
-                    inchideri.insert(next);
-                    q.push(next);
-                }
-            }
+    for(auto tr : nfa[state])
+        if(tr.first == "$")
+        {
+            string next = tr.second;
+            comp_inchideri_stare(nfa, next, inchideri);
         }
-    }
 }
 
 
@@ -56,7 +45,7 @@ int main()
         nfa[from].insert({c,to});
         //cout<<from<<' '<<c<<' '<<to<<'\n';
     }
-    set<string> Q; /// stari initiale dfa posibile
+    set<string> Q; /// stare initiala DFA
     map <set<string>, map<string, set<string>>> dfa;
     map <set<string>, bool> dfa_finals;
     set<set<string>> keys;
@@ -71,12 +60,13 @@ int main()
 //    }
     set<string> initiale_DFA;
     initiale_DFA = Q;
-    cout<<"Stari initiale:";
+    cout<<"Stare initiale:[";
     for(auto x : initiale_DFA)
     {
         cout<<x<<' ';
     }
-    cout<<'\n';
+    cout<<"]\n";
+    /// starea initiala
     set<set<string>> v; // visited
     queue<set<string>> q;/// bfs
     q.push(Q);
@@ -91,10 +81,10 @@ int main()
         for(auto state : c_state)
             for(auto trans : nfa[state])
                 if(trans.first != "$")
-                    sym.insert(trans.first);
+                    sym.insert(trans.first); /// sym - toate simbolurile nevide
         for(auto c_sym : sym)
         {
-            set<string> next_s;
+            set<string> next_s; /// next_s va contine toate tranzitiile in care se poate ajunge din starea curenta
             for(auto state : c_state) {
                 for (auto trans: nfa[state]) {
                     if (trans.first == c_sym || trans.first == "$")
@@ -106,7 +96,7 @@ int main()
                 dfa[c_state][c_sym] = next_s;
                 keys.insert(c_state);
                 dfa_finals[c_state] = false;
-                q.push(next_s);
+                q.push(next_s); /// pt starea curenta si simbolul curent actualizam tranzitia si trecem la urmatoarea stare
             }
         }
     }
