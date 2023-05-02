@@ -87,15 +87,22 @@ int main()
             set<string> next_s; /// next_s va contine toate tranzitiile in care se poate ajunge din starea curenta
             for(auto state : c_state) {
                 for (auto trans: nfa[state]) {
-                    if (trans.first == c_sym || trans.first == "$")
+                    if (trans.first == c_sym)
+                    {
+
+                        next_s.insert(trans.second);
                         comp_inchideri_stare(nfa, trans.second, next_s);
+                    }
+
                 }
             }
             if(!next_s.empty())
             {
                 dfa[c_state][c_sym] = next_s;
                 keys.insert(c_state);
+                keys.insert(next_s);
                 dfa_finals[c_state] = false;
+                dfa_finals[next_s] = false;
                 q.push(next_s); /// pt starea curenta si simbolul curent actualizam tranzitia si trecem la urmatoarea stare
             }
         }
